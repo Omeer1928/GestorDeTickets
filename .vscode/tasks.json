@@ -1,0 +1,88 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Docker: levantar todo (build)",
+      "type": "shell",
+      "command": "docker compose up -d --build",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: estado de contenedores",
+      "type": "shell",
+      "command": "docker compose ps",
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: logs de los servicios",
+      "type": "shell",
+      "command": "docker compose logs -f --tail=100 api-gateway auth-service user-service ticket-service",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: detener todo",
+      "type": "shell",
+      "command": "docker compose down",
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: detener y borrar datos (reinicio limpio)",
+      "type": "shell",
+      "command": "docker compose down -v",
+      "problemMatcher": []
+    },
+    {
+      "label": "Caos: escenario automático (caída y recuperación BD tickets)",
+      "type": "shell",
+      "command": "./chaos/chaos.sh scenario",
+      "windows": { "command": "powershell -ExecutionPolicy Bypass -File .\\chaos\\chaos.ps1 scenario" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Caos: tumbar BD",
+      "type": "shell",
+      "command": "./chaos/chaos.sh db-down ${input:db}",
+      "windows": { "command": "powershell -ExecutionPolicy Bypass -File .\\chaos\\chaos.ps1 db-down ${input:db}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Caos: levantar BD",
+      "type": "shell",
+      "command": "./chaos/chaos.sh db-up ${input:db}",
+      "windows": { "command": "powershell -ExecutionPolicy Bypass -File .\\chaos\\chaos.ps1 db-up ${input:db}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Caos: tumbar / levantar Redis",
+      "type": "shell",
+      "command": "./chaos/chaos.sh redis-${input:updown}",
+      "windows": { "command": "powershell -ExecutionPolicy Bypass -File .\\chaos\\chaos.ps1 redis-${input:updown}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Maven: pruebas unitarias",
+      "type": "shell",
+      "command": "mvn -q test",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "db",
+      "type": "pickString",
+      "description": "¿Qué base de datos?",
+      "options": ["ticket", "user", "auth", "all"],
+      "default": "ticket"
+    },
+    {
+      "id": "updown",
+      "type": "pickString",
+      "description": "Acción",
+      "options": ["down", "up"],
+      "default": "down"
+    }
+  ]
+}

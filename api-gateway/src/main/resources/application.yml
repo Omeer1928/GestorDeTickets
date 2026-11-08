@@ -1,0 +1,82 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: api-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: 0              # misma BD que auth-service: lista negra de tokens + rate limiter
+      timeout: 300ms
+      connect-timeout: 500ms
+  cloud:
+    gateway:
+      # Spring Cloud 2025.0 movió estas propiedades a spring.cloud.gateway.server.webflux.*;
+      # se declaran ambas variantes para compatibilidad.
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 2000
+            response-timeout: 10s
+          metrics:
+            enabled: true
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 10s
+      metrics:
+        enabled: true
+
+gateway:
+  services:
+    auth-url: ${AUTH_SERVICE_URL:http://localhost:8083}
+    user-url: ${USER_SERVICE_URL:http://localhost:8082}
+    ticket-url: ${TICKET_SERVICE_URL:http://localhost:8084}
+  rate-limit:
+    replenish-rate: ${RATE_LIMIT_REPLENISH:20}   # peticiones/segundo sostenidas por usuario o IP
+    burst-capacity: ${RATE_LIMIT_BURST:40}
+
+jwt:
+  secret: ${JWT_SECRET:z/WUV74XyHKHBbIUa+5OgGZc9f8Adbhc0wqzhVtlw3yEdNFk8arMsKFonx08TjFL}
+  issuer: techsupport-auth
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Authentication Service
+        url: /auth/v3/api-docs
+      - name: User Service
+        url: /users/v3/api-docs
+      - name: Ticket Service
+        url: /tickets/v3/api-docs
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics,gateway,circuitbreakers
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        spring.cloud.gateway.requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  structured:
+    format:
+      console: logstash

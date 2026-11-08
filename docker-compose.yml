@@ -1,0 +1,233 @@
+# TechSupport Solutions S.A.C. — Sistema de Gestión de Soporte Técnico TI (SOA)
+#
+#   docker compose up -d --build     → 10 contenedores: gateway + 3 servicios + 3 MySQL + Redis + Prometheus + Grafana
+#
+# Puertos publicados: 8080 API Gateway (Swagger en /swagger-ui.html) · 3000 Grafana · 9090 Prometheus
+# Todo lo demás solo es accesible dentro de las redes internas.
+
+name: techsupport-soa
+
+x-java-service: &java-service
+  restart: unless-stopped
+  deploy:
+    resources:
+      limits:
+        memory: 640m
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+x-mysql: &mysql
+  image: mysql:${MYSQL_VERSION:-8.4}
+  restart: unless-stopped
+  command:
+    - --innodb-buffer-pool-size=64M
+    - --max-connections=80
+  networks: [data]
+  deploy:
+    resources:
+      limits:
+        memory: 512m
+  healthcheck:
+    test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+    interval: 5s
+    timeout: 3s
+    retries: 30
+    start_period: 30s
+
+services:
+  # ======================================================================= capa de datos
+  mysql-auth:
+    <<: *mysql
+    container_name: mysql-auth
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
+      MYSQL_DATABASE: auth_db
+      MYSQL_USER: ${AUTH_DB_USER:-auth_user}
+      MYSQL_PASSWORD: ${AUTH_DB_PASSWORD:-auth_pass}
+    volumes:
+      - mysql-auth-data:/var/lib/mysql
+
+  mysql-user:
+    <<: *mysql
+    container_name: mysql-user
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
+      MYSQL_DATABASE: user_db
+      MYSQL_USER: ${USER_DB_USER:-user_user}
+      MYSQL_PASSWORD: ${USER_DB_PASSWORD:-user_pass}
+    volumes:
+      - mysql-user-data:/var/lib/mysql
+
+  mysql-ticket:
+    <<: *mysql
+    container_name: mysql-ticket
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
+      MYSQL_DATABASE: ticket_db
+      MYSQL_USER: ${TICKET_DB_USER:-ticket_user}
+      MYSQL_PASSWORD: ${TICKET_DB_PASSWORD:-ticket_pass}
+    volumes:
+      - mysql-ticket-data:/var/lib/mysql
+
+  redis:
+    image: redis:${REDIS_VERSION:-7.4-alpine}
+    container_name: redis
+    restart: unless-stopped
+    # Solo caché/estado efímero: sin persistencia. Todas las claves llevan TTL.
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "256mb",
+              "--maxmemory-policy", "volatile-lru"]
+    networks: [data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ======================================================================= capa de negocio
+  auth-service:
+    <<: *java-service
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: docker/service.Dockerfile
+      args:
+        MODULE: auth-service
+    image: techsupport/auth-service:1.0.0
+    environment:
+      DB_HOST: mysql-auth
+      DB_NAME: auth_db
+      DB_USER: ${AUTH_DB_USER:-auth_user}
+      DB_PASSWORD: ${AUTH_DB_PASSWORD:-auth_pass}
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET:-z/WUV74XyHKHBbIUa+5OgGZc9f8Adbhc0wqzhVtlw3yEdNFk8arMsKFonx08TjFL}
+      INTERNAL_KEY: ${INTERNAL_KEY:-9sVRYhyo8EzwpRUJRDFwlP7w2-vdMrEi}
+      USER_SERVICE_URL: http://user-service:8080
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+    networks: [backend, data, monitoring]
+    depends_on:
+      mysql-auth: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  user-service:
+    <<: *java-service
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: docker/service.Dockerfile
+      args:
+        MODULE: user-service
+    image: techsupport/user-service:1.0.0
+    environment:
+      DB_HOST: mysql-user
+      DB_NAME: user_db
+      DB_USER: ${USER_DB_USER:-user_user}
+      DB_PASSWORD: ${USER_DB_PASSWORD:-user_pass}
+      REDIS_HOST: redis
+      INTERNAL_KEY: ${INTERNAL_KEY:-9sVRYhyo8EzwpRUJRDFwlP7w2-vdMrEi}
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+    networks: [backend, data, monitoring]
+    depends_on:
+      mysql-user: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  ticket-service:
+    <<: *java-service
+    container_name: ticket-service
+    build:
+      context: .
+      dockerfile: docker/service.Dockerfile
+      args:
+        MODULE: ticket-service
+    image: techsupport/ticket-service:1.0.0
+    environment:
+      DB_HOST: mysql-ticket
+      DB_NAME: ticket_db
+      DB_USER: ${TICKET_DB_USER:-ticket_user}
+      DB_PASSWORD: ${TICKET_DB_PASSWORD:-ticket_pass}
+      REDIS_HOST: redis
+      INTERNAL_KEY: ${INTERNAL_KEY:-9sVRYhyo8EzwpRUJRDFwlP7w2-vdMrEi}
+      USER_SERVICE_URL: http://user-service:8080
+      DISPATCH_INTERVAL_MS: ${DISPATCH_INTERVAL_MS:-20000}
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+    networks: [backend, data, monitoring]
+    depends_on:
+      mysql-ticket: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      user-service: { condition: service_healthy }
+
+  # ======================================================================= capa de integración
+  api-gateway:
+    <<: *java-service
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: docker/service.Dockerfile
+      args:
+        MODULE: api-gateway
+    image: techsupport/api-gateway:1.0.0
+    ports:
+      - "${GATEWAY_PORT:-8080}:8080"
+    environment:
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET:-z/WUV74XyHKHBbIUa+5OgGZc9f8Adbhc0wqzhVtlw3yEdNFk8arMsKFonx08TjFL}
+      AUTH_SERVICE_URL: http://auth-service:8080
+      USER_SERVICE_URL: http://user-service:8080
+      TICKET_SERVICE_URL: http://ticket-service:8080
+      RATE_LIMIT_REPLENISH: ${RATE_LIMIT_REPLENISH:-20}
+      RATE_LIMIT_BURST: ${RATE_LIMIT_BURST:-40}
+    networks: [edge, backend, data, monitoring]
+    depends_on:
+      redis: { condition: service_healthy }
+      auth-service: { condition: service_healthy }
+      user-service: { condition: service_healthy }
+      ticket-service: { condition: service_healthy }
+
+  # ======================================================================= auditoría (Prometheus + Grafana)
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION:-v3.5.0}
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-lifecycle
+    volumes:
+      - ./infra/prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks: [monitoring]
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION:-12.0.0}
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/01-auditoria.json
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    networks: [monitoring]
+    depends_on: [prometheus]
+
+networks:
+  edge: {}         # cliente ↔ gateway
+  backend: {}      # gateway ↔ servicios
+  data: {}         # servicios ↔ MySQL/Redis (aislada del exterior)
+  monitoring: {}   # Prometheus/Grafana ↔ actuator de los servicios
+
+volumes:
+  mysql-auth-data:
+  mysql-user-data:
+  mysql-ticket-data:
+  prometheus-data:
+  grafana-data:

@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+  external_labels:
+    system: techsupport-soa
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+scrape_configs:
+  # Servicios Spring Boot: Micrometer expone /actuator/prometheus en el puerto de gestión 8081
+  - job_name: api-gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["api-gateway:8081"]
+        labels: { layer: integracion }
+
+  - job_name: auth-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["auth-service:8081"]
+        labels: { layer: negocio }
+
+  - job_name: user-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["user-service:8081"]
+        labels: { layer: negocio }
+
+  - job_name: ticket-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["ticket-service:8081"]
+        labels: { layer: negocio }
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+

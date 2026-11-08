@@ -1,0 +1,65 @@
+groups:
+  - name: disponibilidad
+    rules:
+      - alert: BaseDeDatosCaida
+        expr: database_up == 0
+        for: 10s
+        labels: { severity: critical }
+        annotations:
+          summary: "La base de datos de {{ $labels.application }} no responde"
+          description: "database_up=0 por más de 10 s. Los servicios responden desde caché (stale) y rechazan escrituras con 503."
+
+      - alert: ServicioCaido
+        expr: up{job=~"api-gateway|auth-service|user-service|ticket-service"} == 0
+        for: 15s
+        labels: { severity: critical }
+        annotations:
+          summary: "El servicio {{ $labels.job }} no responde al scrape"
+
+      - alert: RedisCaido
+        expr: min(cache_redis_up) == 0
+        for: 10s
+        labels: { severity: warning }
+        annotations:
+          summary: "Redis no disponible: la caché se omite y no hay respaldo stale"
+
+  - name: resiliencia
+    rules:
+      - alert: CircuitBreakerAbierto
+        expr: max by (application, name) (resilience4j_circuitbreaker_state{state=~"open|half_open"}) == 1
+        for: 5s
+        labels: { severity: warning }
+        annotations:
+          summary: "Circuit breaker {{ $labels.name }} abierto en {{ $labels.application }}"
+
+      - alert: RespondiendoConCacheStale
+        expr: sum by (application) (rate(cache_requests_total{result="stale"}[1m])) > 0
+        for: 0s
+        labels: { severity: info }
+        annotations:
+          summary: "{{ $labels.application }} está sirviendo datos stale desde Redis"
+
+      - alert: TasaErrores5xxAlta
+        expr: |
+          sum by (application) (rate(http_server_requests_seconds_count{status=~"5.."}[1m]))
+            / sum by (application) (rate(http_server_requests_seconds_count[1m])) > 0.05
+        for: 30s
+        labels: { severity: warning }
+        annotations:
+          summary: "Más del 5% de respuestas 5xx en {{ $labels.application }}"
+
+  - name: seguridad-auditoria
+    rules:
+      - alert: PosibleFuerzaBruta
+        expr: sum(increase(auth_login_total{result=~"failure|locked"}[5m])) > 10
+        for: 0s
+        labels: { severity: warning }
+        annotations:
+          summary: "Más de 10 logins fallidos en 5 minutos"
+
+      - alert: TicketsCriticosEnEspera
+        expr: tickets_waiting{queue="PRIORITY_QUEUE"} > 0
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: "Hay {{ $value }} tickets críticos/altos esperando técnico por más de 2 minutos"

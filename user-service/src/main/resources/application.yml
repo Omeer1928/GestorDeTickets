@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: user-service
+  config:
+    import: classpath:common-defaults.yml
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:user_db}?connectTimeout=2000&socketTimeout=5000&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&useUnicode=true&characterEncoding=UTF-8
+    username: ${DB_USER:user_user}
+    password: ${DB_PASSWORD:user_pass}
+  data:
+    redis:
+      database: 1
+
+springdoc:
+  api-docs:
+    path: /users/v3/api-docs
+
+app:
+  cache-ttl:
+    profile: 5m
+    list: 60s
+    available: 10s

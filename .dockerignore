@@ -1,0 +1,10 @@
+**/target
+**/.idea
+**/*.iml
+.git
+.vscode
+infra
+chaos
+postman
+docs
+*.md

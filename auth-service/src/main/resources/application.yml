@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: auth-service
+  config:
+    import: classpath:common-defaults.yml
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:auth_db}?connectTimeout=2000&socketTimeout=5000&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&useUnicode=true&characterEncoding=UTF-8
+    username: ${DB_USER:auth_user}
+    password: ${DB_PASSWORD:auth_pass}
+  data:
+    redis:
+      database: 0              # compartida con el gateway (lista negra de tokens)
+
+springdoc:
+  api-docs:
+    path: /auth/v3/api-docs
+
+jwt:
+  secret: ${JWT_SECRET:z/WUV74XyHKHBbIUa+5OgGZc9f8Adbhc0wqzhVtlw3yEdNFk8arMsKFonx08TjFL}
+  issuer: techsupport-auth
+  refresh-ttl: 24h
+  access-ttl:              # principio de privilegio mínimo (sección 11 del documento)
+    ADMIN: 15m
+    TECNICO: 30m
+    CLIENTE: 30m
+
+app:
+  security:
+    public-paths:
+      - /auth/login
+      - /auth/refresh
+      - /auth/validate
+      - /auth/logout
+      - /auth/register
+  auth:
+    max-failed-attempts: 5
+    lock-duration: 15m
+    credential-cache-ttl: 10m
+  services:
+    user-service-url: ${USER_SERVICE_URL:http://localhost:8082}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        base-config: default
+  retry:
+    instances:
+      userService:
+        base-config: default

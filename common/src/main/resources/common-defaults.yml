@@ -1,0 +1,108 @@
+# Configuración compartida por auth-service, user-service y ticket-service.
+# Cada servicio la importa con spring.config.import y solo define lo propio.
+
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  threads:
+    virtual:
+      enabled: true          # Java 21: hilos virtuales para las peticiones HTTP
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none         # el esquema lo gobierna Flyway
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  datasource:
+    hikari:
+      connection-timeout: 2000   # si la BD cae, fallar en 2 s en vez de 30 s
+      validation-timeout: 1000
+      maximum-pool-size: 10
+      minimum-idle: 2
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 500ms
+      connect-timeout: 500ms
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+management:
+  server:
+    port: 8081               # actuator en puerto interno, nunca publicado
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics,circuitbreakers
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        tickets.assignment: true
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    key-values:
+      application: ${spring.application.name}
+
+logging:
+  structured:
+    format:
+      console: logstash      # logs JSON → Loki los parsea con "| json"
+  level:
+    root: INFO
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
+    com.zaxxer.hikari.pool: WARN
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 4
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-failure-predicate: pe.techsupport.common.resilience.InfraFailures
+        register-health-indicator: true
+    instances:
+      db:
+        base-config: default
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 200ms
+        retry-exception-predicate: pe.techsupport.common.resilience.InfraFailures
+
+springdoc:
+  swagger-ui:
+    enabled: false           # la UI se sirve agregada desde el API Gateway
+
+app:
+  internal-key: ${INTERNAL_KEY:dev-internal-key-change-me}
+  cache:
+    enabled: ${CACHE_ENABLED:true}
+    stale-ttl: 24h

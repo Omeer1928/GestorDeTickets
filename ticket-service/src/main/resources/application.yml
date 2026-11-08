@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: ticket-service
+  config:
+    import: classpath:common-defaults.yml
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:ticket_db}?connectTimeout=2000&socketTimeout=5000&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&useUnicode=true&characterEncoding=UTF-8
+    username: ${DB_USER:ticket_user}
+    password: ${DB_PASSWORD:ticket_pass}
+  data:
+    redis:
+      database: 2
+
+springdoc:
+  api-docs:
+    path: /tickets/v3/api-docs
+
+app:
+  services:
+    user-service-url: ${USER_SERVICE_URL:http://localhost:8082}
+  tickets:
+    dispatch-interval-ms: ${DISPATCH_INTERVAL_MS:20000}   # reintento de la cola de espera
+    avg-attention-minutes: 15                            # para estimar el tiempo de espera
+    view-cache-ttl: 30s
+    list-cache-ttl: 15s
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        base-config: default
+  retry:
+    instances:
+      userService:
+        base-config: default

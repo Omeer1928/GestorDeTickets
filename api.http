@@ -1,0 +1,81 @@
+### Pruebas rápidas desde Visual Studio Code (extensión "REST Client"): clic en "Send Request" sobre cada petición.
+### Para la batería completa con aserciones use postman/TechSupport-SOA.postman_collection.json
+
+@baseUrl = http://localhost:8080
+
+### 1. Login CLIENTE
+# @name loginCliente
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "cgonzalez@techsupport.pe", "password": "Cliente123!" }
+
+### 2. Login TECNICO N2
+# @name loginTecnico
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "lramirez@techsupport.pe", "password": "Tecnico123!" }
+
+### 3. Login ADMIN
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{ "email": "admin@techsupport.pe", "password": "Admin123!" }
+
+@cliente = {{loginCliente.response.body.accessToken}}
+@tecnico = {{loginTecnico.response.body.accessToken}}
+@admin = {{loginAdmin.response.body.accessToken}}
+
+### 4. Registrar incidencia CRÍTICA (se asigna de inmediato)
+# @name critico
+POST {{baseUrl}}/tickets
+Authorization: Bearer {{cliente}}
+Content-Type: application/json
+
+{ "title": "Caída total del ERP", "description": "El ERP no responde en producción.", "category": "BASES_DATOS" }
+
+@ticketId = {{critico.response.body.ticketId}}
+
+### 5. Ver el ticket (mire la cabecera X-Cache: MISS / HIT / STALE)
+GET {{baseUrl}}/tickets/{{ticketId}}
+Authorization: Bearer {{cliente}}
+
+### 6. Mis tickets
+GET {{baseUrl}}/tickets/client/USR-C0001
+Authorization: Bearer {{cliente}}
+
+### 7. Técnico inicia el diagnóstico
+PATCH {{baseUrl}}/tickets/{{ticketId}}/start
+Authorization: Bearer {{tecnico}}
+
+### 8. Escalar a N3
+PATCH {{baseUrl}}/tickets/{{ticketId}}/escalate
+Authorization: Bearer {{tecnico}}
+Content-Type: application/json
+
+{ "reason": "Se requiere reinicio de instancia a nivel de infraestructura" }
+
+### 9. Bitácora del ticket
+GET {{baseUrl}}/tickets/{{ticketId}}/events
+Authorization: Bearer {{admin}}
+
+### 10. Técnicos disponibles para BD nivel N2
+GET {{baseUrl}}/users/technicians/available?specialty=BASES_DATOS&level=N2
+Authorization: Bearer {{admin}}
+
+### 11. Cola de espera
+GET {{baseUrl}}/tickets/queue
+Authorization: Bearer {{admin}}
+
+### 12. Crear ticket con la BD de tickets caída → 503 rápido
+POST {{baseUrl}}/tickets
+Authorization: Bearer {{cliente}}
+Content-Type: application/json
+
+{ "title": "Prueba", "description": "Con BD caída", "category": "SISTEMAS_SOFTWARE" }
+
+### 13. Logout (revoca el token del cliente)
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{cliente}}
