@@ -77,7 +77,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase(auth_login_total{result=\"success\"}[$__range]))",
+          "expr": "sum(increase(auth_login_total{result=\"success\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "datasource": {
             "type": "prometheus",
@@ -139,7 +139,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase(auth_login_total{result=~\"failure|locked|disabled\"}[$__range]))",
+          "expr": "sum(increase(auth_login_total{result=~\"failure|locked|disabled\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "datasource": {
             "type": "prometheus",
@@ -209,7 +209,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase(tickets_created_total[$__range]))",
+          "expr": "sum(increase(tickets_registered_total[$__range])) or vector(0)",
           "legendFormat": "",
           "datasource": {
             "type": "prometheus",
@@ -271,7 +271,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase(tickets_created_total{priority=\"CRITICA\"}[$__range]))",
+          "expr": "sum(increase(tickets_registered_total{priority=\"CRITICA\"}[$__range])) or vector(0)",
           "legendFormat": "",
           "datasource": {
             "type": "prometheus",
@@ -333,7 +333,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase(tickets_escalations_total[$__range]))",
+          "expr": "sum(increase(tickets_escalations_total[$__range])) or vector(0)",
           "legendFormat": "",
           "datasource": {
             "type": "prometheus",
@@ -395,7 +395,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(tickets_waiting{queue=\"PRIORITY_QUEUE\"})",
+          "expr": "sum(tickets_waiting{queue=\"PRIORITY_QUEUE\"}) or vector(0)",
           "legendFormat": "",
           "datasource": {
             "type": "prometheus",
@@ -600,7 +600,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (priority) (increase(tickets_created_total[1m]))",
+          "expr": "sum by (priority) (increase(tickets_registered_total[1m]))",
           "legendFormat": "{{priority}}",
           "datasource": {
             "type": "prometheus",

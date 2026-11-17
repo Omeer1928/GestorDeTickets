@@ -27,10 +27,37 @@ public class TicketMetrics {
                 .description("Tickets en espera de técnico").tag("queue", "PRIORITY_QUEUE").register(meters);
         Gauge.builder("tickets.waiting", waitingStandard, AtomicLong::get)
                 .description("Tickets en espera de técnico").tag("queue", "STANDARD_QUEUE").register(meters);
+        preRegisterCounters();
     }
 
+    /**
+     * Crea todos los contadores en 0 al arrancar. Si un contador nace recién con el primer evento,
+     * Prometheus lo ve por primera vez valiendo 1 y increase() calcula 1 → 1 = 0, así que el primer
+     * ticket no se contaría en los dashboards.
+     */
+    private void preRegisterCounters() {
+        for (Priority p : Priority.values()) {
+            for (Specialty c : Specialty.values()) {
+                meters.counter("tickets.registered", "priority", p.name(), "category", c.name());
+            }
+        }
+        for (TicketStatus st : TicketStatus.values()) {
+            meters.counter("tickets.transitions", "status", st.name());
+        }
+        for (String type : new String[]{"JERARQUICO", "FUNCIONAL", "REASIGNACION"}) {
+            meters.counter("tickets.escalations", "type", type);
+        }
+        for (String result : new String[]{"assigned", "no_candidates", "dependency_unavailable", "conflict", "error"}) {
+            meters.counter("tickets.dispatch", "result", result);
+        }
+    }
+
+    /**
+     * Nota: el nombre NO puede terminar en ".created": la librería de Prometheus reserva el sufijo
+     * "_created" y lo elimina (se publicaría como tickets_total). Por eso se usa "tickets.registered".
+     */
     public void created(Priority priority, Specialty category) {
-        meters.counter("tickets.created", "priority", priority.name(), "category", category.name()).increment();
+        meters.counter("tickets.registered", "priority", priority.name(), "category", category.name()).increment();
     }
 
     public void transition(TicketStatus to) {

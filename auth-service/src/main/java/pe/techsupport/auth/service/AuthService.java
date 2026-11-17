@@ -89,6 +89,10 @@ public class AuthService {
         this.userService = userService;
         this.audit = audit;
         this.meters = meters;
+        // Contadores en 0 desde el arranque para que el primer evento se cuente en los dashboards
+        for (String result : new String[]{"success", "failure", "locked", "disabled"}) {
+            meters.counter("auth.login", "result", result);
+        }
     }
 
     // ---------------------------------------------------------------- login

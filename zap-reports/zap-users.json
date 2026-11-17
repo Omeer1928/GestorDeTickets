@@ -1,0 +1,879 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Tue, 17 Nov 2026 01:44:08",
+	"created": "2026-11-17T01:44:08.314999865Z",
+	"insights":[
+		{
+			"level": "Medium",
+			"reason": "Exceeded High",
+			"site": "http://api-gateway:8080",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "99"
+		},
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "1"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "1"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "70"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.endpoint.method.DELETE",
+			"description": "Percentage of endpoints with method DELETE",
+			"statistic": "19"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "63"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.endpoint.method.PATCH",
+			"description": "Percentage of endpoints with method PATCH",
+			"statistic": "7"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "7"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.endpoint.method.PUT",
+			"description": "Percentage of endpoints with method PUT",
+			"statistic": "3"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "57"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://api-gateway:8080",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "1"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://api-gateway:8080",
+			"@host": "api-gateway",
+			"@port": "8080",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "90004",
+					"alertRef": "90004-1",
+					"alert": "Cross-Origin-Resource-Policy Header Missing or Invalid",
+					"name": "Cross-Origin-Resource-Policy Header Missing or Invalid",
+					"riskcode": "1",
+					"confidence": "2",
+					"riskdesc": "Low (Medium)",
+					"desc": "<p>Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.</p>",
+					"instances":[ 
+						{
+							"id": "23",
+							"uri": "http://api-gateway:8080/users/clients",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients",
+							"method": "GET",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "118",
+							"uri": "http://api-gateway:8080/users/specialties",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/specialties",
+							"method": "GET",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "16",
+							"uri": "http://api-gateway:8080/users/technicians",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians",
+							"method": "GET",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "5",
+							"uri": "http://api-gateway:8080/users/v3/api-docs",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/v3\/api-docs",
+							"method": "GET",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "18",
+							"uri": "http://api-gateway:8080/users/technicians",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians ()({firstName,lastName,email,phone,supportLevel,specialties:[],maxConcurrentTickets})",
+							"method": "POST",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>Ensure that the application/web server sets the Cross-Origin-Resource-Policy header appropriately, and that it sets the Cross-Origin-Resource-Policy header to 'same-origin' for all web pages.</p><p>'same-site' is considered as less secured and should be avoided.</p><p>If resources must be shared, set the header to 'cross-origin'.</p><p>If possible, ensure that the end user uses a standards-compliant and modern web browser that supports the Cross-Origin-Resource-Policy header (https://caniuse.com/mdn-http_headers_cross-origin-resource-policy).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy</p>",
+					"cweid": "693",
+					"wascid": "14",
+					"sourceid": "11"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "1733",
+							"uri": "http://api-gateway:8080/computeMetadata/v1/",
+							"nodeName": "http:\/\/api-gateway:8080\/computeMetadata\/v1\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1724",
+							"uri": "http://api-gateway:8080/latest/meta-data/",
+							"nodeName": "http:\/\/api-gateway:8080\/latest\/meta-data\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1786",
+							"uri": "http://api-gateway:8080/metadata/instance",
+							"nodeName": "http:\/\/api-gateway:8080\/metadata\/instance",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1791",
+							"uri": "http://api-gateway:8080/metadata/v1",
+							"nodeName": "http:\/\/api-gateway:8080\/metadata\/v1",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1742",
+							"uri": "http://api-gateway:8080/opc/v1/instance/",
+							"nodeName": "http:\/\/api-gateway:8080\/opc\/v1\/instance\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1762",
+							"uri": "http://api-gateway:8080/opc/v2/instance/",
+							"nodeName": "http:\/\/api-gateway:8080\/opc\/v2\/instance\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1794",
+							"uri": "http://api-gateway:8080/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/api-gateway:8080\/openstack\/latest\/meta_data.json",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "http://api-gateway:8080/users/clients/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2316",
+							"uri": "http://api-gateway:8080/users/clients/id/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "11",
+							"uri": "http://api-gateway:8080/users/technicians/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2322",
+							"uri": "http://api-gateway:8080/users/technicians/id/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "34",
+							"uri": "http://api-gateway:8080",
+							"nodeName": "http:\/\/api-gateway:8080",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2324",
+							"uri": "http://api-gateway:8080/",
+							"nodeName": "http:\/\/api-gateway:8080\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "26",
+							"uri": "http://api-gateway:8080/612279213207002673",
+							"nodeName": "http:\/\/api-gateway:8080\/612279213207002673",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "39",
+							"uri": "http://api-gateway:8080/users",
+							"nodeName": "http:\/\/api-gateway:8080\/users",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "474",
+							"uri": "http://api-gateway:8080/users",
+							"nodeName": "http:\/\/api-gateway:8080\/users",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2327",
+							"uri": "http://api-gateway:8080/users/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "27",
+							"uri": "http://api-gateway:8080/users/4175707631692639422",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/4175707631692639422",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2326",
+							"uri": "http://api-gateway:8080/users/clients/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "http://api-gateway:8080/users/clients/6329750246764833654",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/6329750246764833654",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2621",
+							"uri": "http://api-gateway:8080/users/clients/actuator/health",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://api-gateway:8080/users/clients/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2328",
+							"uri": "http://api-gateway:8080/users/clients/id/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "29",
+							"uri": "http://api-gateway:8080/users/clients/id/7866967406904867921",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id\/7866967406904867921",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "25",
+							"uri": "http://api-gateway:8080/users/clients/id/validate",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id\/validate",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2333",
+							"uri": "http://api-gateway:8080/users/clients/id/validate/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id\/validate\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2329",
+							"uri": "http://api-gateway:8080/users/specialties/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/specialties\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2332",
+							"uri": "http://api-gateway:8080/users/technicians/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "30",
+							"uri": "http://api-gateway:8080/users/technicians/6019695597804276226",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/6019695597804276226",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "47",
+							"uri": "http://api-gateway:8080/users/technicians/available?specialty=http%3A%2F%2Fwww.google.com%2F&level=N1",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/available (level,specialty)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "101",
+							"uri": "http://api-gateway:8080/users/technicians/available?specialty=HARDWARE_MANTENIMIENTO&level=http%3A%2F%2Fwww.google.com",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/available (level,specialty)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2330",
+							"uri": "http://api-gateway:8080/users/technicians/available/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/available\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "http://api-gateway:8080/users/technicians/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2331",
+							"uri": "http://api-gateway:8080/users/technicians/id/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://api-gateway:8080/users/technicians/id/9074349677234920849",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/9074349677234920849",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "http://api-gateway:8080/users/technicians/id/workload",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/workload",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2335",
+							"uri": "http://api-gateway:8080/users/technicians/id/workload/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/workload\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "50",
+							"uri": "http://api-gateway:8080/users/technicians/specialty",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/specialty",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "487",
+							"uri": "http://api-gateway:8080/users/technicians/specialty",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/specialty",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2338",
+							"uri": "http://api-gateway:8080/users/technicians/specialty/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/specialty\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "32",
+							"uri": "http://api-gateway:8080/users/technicians/specialty/5226866960937974313",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/specialty\/5226866960937974313",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "2336",
+							"uri": "http://api-gateway:8080/users/technicians/specialty/HARDWARE_MANTENIMIENTO/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/specialty\/HARDWARE_MANTENIMIENTO\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "58",
+							"uri": "http://api-gateway:8080/users/v3",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/v3",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "284",
+							"uri": "http://api-gateway:8080/users/v3",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/v3",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2339",
+							"uri": "http://api-gateway:8080/users/v3/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/v3\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "33",
+							"uri": "http://api-gateway:8080/users/v3/53156381180439235",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/v3\/53156381180439235",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2340",
+							"uri": "http://api-gateway:8080/users/v3/api-docs/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/v3\/api-docs\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "9",
+							"uri": "http://api-gateway:8080/users/technicians/id/status",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/status ()({isAvailable})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2321",
+							"uri": "http://api-gateway:8080/users/technicians/id/status/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/status\/ ()({isAvailable})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "8",
+							"uri": "http://api-gateway:8080/users/technicians/id/workload",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/workload ()({delta})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "2319",
+							"uri": "http://api-gateway:8080/users/technicians/id/workload/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/workload\/ ()({delta})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "http://api-gateway:8080/users/clients",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients ()({firstName,lastName,email,phone,companyName,ruc})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "98",
+							"uri": "http://api-gateway:8080/users/clients",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients ()({firstName,lastName,email,phone,companyName,ruc})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2318",
+							"uri": "http://api-gateway:8080/users/clients/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/ ()({firstName,lastName,email,phone,companyName,ruc})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "140",
+							"uri": "http://api-gateway:8080/users/technicians",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians ()({firstName,lastName,email,phone,supportLevel,specialties:[],maxConcurrentTickets})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "38",
+							"uri": "http://api-gateway:8080/users/technicians",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians ()({firstName,lastName,email,phone,supportLevel,specialties:[],maxConcurrentTickets})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "100",
+							"uri": "http://api-gateway:8080/users/technicians",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians ()({firstName,lastName,email,phone,supportLevel,specialties:[],maxConcurrentTickets})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2323",
+							"uri": "http://api-gateway:8080/users/technicians/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/ ()({firstName,lastName,email,phone,supportLevel,specialties:[],maxConcurrentTickets})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://api-gateway:8080/users/clients/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id ()({firstName,lastName,phone,companyName,ruc,status})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "99",
+							"uri": "http://api-gateway:8080/users/clients/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id ()({firstName,lastName,phone,companyName,ruc,status})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "2317",
+							"uri": "http://api-gateway:8080/users/clients/id/",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id\/ ()({firstName,lastName,phone,companyName,ruc,status})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						}
+					],
+					"count": "61",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "1741"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "12",
+							"uri": "http://api-gateway:8080/users/clients/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "DELETE ",
+							"otherinfo": ""
+						},
+						{
+							"id": "3",
+							"uri": "http://api-gateway:8080/users/clients/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://api-gateway:8080/users/v3/api-docs",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/v3\/api-docs",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "http://api-gateway:8080/users/technicians/id/workload",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/technicians\/id\/workload ()({delta})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "PATCH ",
+							"otherinfo": ""
+						},
+						{
+							"id": "14",
+							"uri": "http://api-gateway:8080/users/clients/id",
+							"nodeName": "http:\/\/api-gateway:8080\/users\/clients\/id ()({firstName,lastName,phone,companyName,ruc,status})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "PUT ",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "8"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

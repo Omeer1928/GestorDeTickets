@@ -40,8 +40,7 @@ public interface TechnicianRepository extends JpaRepository<Technician, Long> {
     List<Technician> findAllDispatchCandidates(@Param("active") TechnicianStatus active);
 
     /**
-     * Reserva atómica de capacidad: el UPDATE solo afecta la fila si aún hay cupo, por lo que dos
-     * asignaciones concurrentes nunca superan max_concurrent_tickets (sin bloqueos explícitos).
+     * Reserva atómica de capacidad: el UPDATE solo afecta la fila si aún hay cupo
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
@@ -59,3 +58,5 @@ public interface TechnicianRepository extends JpaRepository<Technician, Long> {
             where t.userId = :userId""")
     int releaseSlot(@Param("userId") String userId, @Param("now") Instant now);
 }
+
+

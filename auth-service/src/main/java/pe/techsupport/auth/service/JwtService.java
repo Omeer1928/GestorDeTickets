@@ -4,26 +4,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
-
 import javax.crypto.SecretKey;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-
 import org.springframework.stereotype.Service;
-
 import pe.techsupport.auth.config.JwtProperties;
-
-/**
- * Emisión y validación de JWT firmados con HMAC-SHA256. Claims: sub (email), userId, role, fullName,
- * jti (para la lista negra en logout), iat y exp.
- */
 @Service
 public class JwtService {
-
     private final JwtProperties props;
     private final SecretKey key;
 

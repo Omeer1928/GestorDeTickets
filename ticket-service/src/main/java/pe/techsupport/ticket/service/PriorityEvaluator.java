@@ -4,23 +4,14 @@ import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import org.springframework.stereotype.Component;
-
 import pe.techsupport.ticket.domain.Priority;
 import pe.techsupport.ticket.domain.Specialty;
 import pe.techsupport.ticket.domain.SupportLevel;
-
-/**
- * Reglas de criticidad (tabla de la sección 10 del documento): cada categoría tiene una criticidad
- * base y palabras clave que la elevan. El texto se normaliza (minúsculas, sin tildes) antes de comparar.
- */
 @Component
 public class PriorityEvaluator {
-
     record Rule(Priority base, List<String> keywords, Priority elevated) {
     }
-
     private static final Map<Specialty, Rule> RULES = Map.of(
             Specialty.BASES_DATOS, new Rule(Priority.ALTA,
                     List.of("caida", "produccion", "no conecta"), Priority.CRITICA),
